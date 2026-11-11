@@ -1,0 +1,9 @@
+import { useMemo, useState } from 'react'
+import { Calculator } from 'lucide-react'
+const money=n=>`PKR ${Math.round(n).toLocaleString('en-PK')}`
+export default function EmiCalculator(){
+ const [price,setPrice]=useState(30),[down,setDown]=useState(25),[rate,setRate]=useState(14),[years,setYears]=useState(15)
+ const result=useMemo(()=>{const principal=price*10000000*(1-down/100),r=rate/1200,n=years*12,monthly=r===0?principal/n:principal*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);return {principal,monthly,total:monthly*n,interest:monthly*n-principal,downAmount:price*10000000*down/100}},[price,down,rate,years])
+ const sliders=[['Property price',price,setPrice,5,100,1,`PKR ${price} Crore`],['Down payment',down,setDown,10,80,5,`${down}%`],['Annual interest rate',rate,setRate,5,25,.5,`${rate}%`],['Loan period',years,setYears,1,25,1,`${years} years`]]
+ return <div className="emi-panel"><div className="emi-controls">{sliders.map(([label,value,set,min,max,step,display])=><label className="slider-control" key={label}><span>{label}<output>{display}</output></span><input type="range" min={min} max={max} step={step} value={value} onChange={e=>set(+e.target.value)}/></label>)}</div><div className="emi-result"><Calculator size={27}/><span className="result-label">Estimated monthly instalment</span><strong>{money(result.monthly)}</strong><div className="result-list"><div><span>Loan amount</span><b>{money(result.principal)}</b></div><div><span>Total interest</span><b>{money(result.interest)}</b></div><div><span>Down payment</span><b>{money(result.downAmount)}</b></div><div className="total"><span>Total payable</span><b>{money(result.total+result.downAmount)}</b></div></div><small>Illustrative estimate only. Actual bank rates, fees and eligibility may differ.</small></div></div>
+}
